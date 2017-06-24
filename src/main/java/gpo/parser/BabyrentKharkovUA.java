@@ -29,6 +29,9 @@ public class BabyrentKharkovUA {
         elements = null;
         if (document != null) {
             elements = document.getElementsByClass("product");
+            for(Element el: elements) {
+                System.out.println(el.tag());
+            }
         }
     }
 
@@ -50,32 +53,40 @@ public class BabyrentKharkovUA {
         return null;
     }
 
-    public ParsedProduct parseProduct() {
-        Document productPage = Jsoup.connect(productPageURL + productId);
-        if (productPage != null) {
-            ParsedProduct p = new ParsedProduct(productPageURL + productId);
-            Element title = productPage.getElementById("productName");
-            if (title != null)
-                p.setTitle(title.text());
-            Element prices = productPage.getElementById("productPrices");
-            if (prices != null) {
-                p.setRate1w(parseRate1w(prices.text()));
-                p.setRate1m(parseRate1m(prices.text()));
-                p.setDeposite(parseDeposit(prices.text()));
-            }
-            Element description = productPage.getElementById("productDescription");
-            if (description != null)
-                p.setDescription(description.text());
-            Element imgDiv = productPage.getElementById("productMainImage");
-            if (imgDiv != null) {
-                Elements imgs = imgDiv.getElementsByTag("img");
-                if (imgs != null && !imgs.isEmpty()) {
-                    Element img = imgs.get(0);
-                    if (img != null && img.attr("src") != null)
-                        p.setDefaultImage(basePath + img.attr("src"));
+    public ParsedProduct parseProduct() throws IOException {
+        Elements links =  elements.get(currentLinkPosition++)
+                .getElementsByClass("link");
+        if (links != null && !links.isEmpty()) {
+            String productURL = links
+                                    .get(0)
+                                    .attr("href");
+            System.out.println(productURL);
+            Document productPage = Jsoup.connect(productURL).get();
+            if (productPage != null) {
+                ParsedProduct p = new ParsedProduct(productURL);
+                Element title = productPage.getElementById("productName");
+                if (title != null)
+                    p.setTitle(title.text());
+                Element prices = productPage.getElementById("productPrices");
+                if (prices != null) {
+                    p.setRate1w(parseRate1w(prices.text()));
+                    p.setRate1m(parseRate1m(prices.text()));
+                    p.setDeposite(parseDeposit(prices.text()));
                 }
+                Element description = productPage.getElementById("productDescription");
+                if (description != null)
+                    p.setDescription(description.text());
+                Element imgDiv = productPage.getElementById("productMainImage");
+                if (imgDiv != null) {
+                    Elements imgs = imgDiv.getElementsByTag("img");
+                    if (imgs != null && !imgs.isEmpty()) {
+                        Element img = imgs.get(0);
+                        if (img != null && img.attr("src") != null)
+                            p.setDefaultImage(basePath + img.attr("src"));
+                    }
+                }
+                return p;
             }
-            return p;
         }
         return null;
     }
