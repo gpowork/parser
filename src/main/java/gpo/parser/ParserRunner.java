@@ -1,5 +1,7 @@
 package gpo.parser;
 
+import gpo.result.ParsedProduct;
+
 import java.io.IOException;
 
 /**
@@ -9,8 +11,11 @@ public class ParserRunner {
 
     public static void main(String... args) throws IOException {
         BabyrentKharkovUA parser = new BabyrentKharkovUA();
+        System.out.println("Parsing of " + parser.basePath + " started...");
         while(parser.hasNext()) {
-            System.out.println(parser.parseProduct());
+            ParsedProduct p = parser.parseProduct();
+            if (p != null)
+                System.out.println(p);
         }
     }
 }

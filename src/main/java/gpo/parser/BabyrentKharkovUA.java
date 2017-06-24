@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  */
 public class BabyrentKharkovUA {
 
-    private static String basePath = "http://babyrent.kharkov.ua/";
+    public final static String basePath = "http://babyrent.kharkov.ua/";
     private static String allProductsURL = basePath + "index.php?main_page=products_all&page=";
     private static String productPageURL = basePath + "index.php?main_page=product_info&products_id=";
     private int pageNumber = 0;
@@ -29,9 +29,6 @@ public class BabyrentKharkovUA {
         elements = null;
         if (document != null) {
             elements = document.getElementsByClass("product");
-            for(Element el: elements) {
-                System.out.println(el.tag());
-            }
         }
     }
 
@@ -41,16 +38,29 @@ public class BabyrentKharkovUA {
         return elements != null && currentLinkPosition < elements.size();
     }
 
-    private BigDecimal parseRate1w(String text) {
+    private BigDecimal parseRate(String text, String keyword, String stopKeyword) {
+        if (text != null && keyword != null && stopKeyword != null && !text.isEmpty()) {
+            int pos = text.indexOf(keyword);
+            if (pos >= 0) {
+                int stopPos = pos + text.substring(pos).indexOf(stopKeyword);
+                if (stopPos >= 0) {
+                    return new BigDecimal(text.substring(pos + keyword.length(), stopPos).trim());
+                }
+            }
+        }
         return null;
+    }
+
+    private BigDecimal parseRate1w(String text) {
+        return parseRate(text, "неделю: ", "грн");
     }
 
     private BigDecimal parseRate1m(String text) {
-        return null;
+        return parseRate(text, "месяц: ", "грн");
     }
 
     private BigDecimal parseDeposit(String text) {
-        return null;
+        return parseRate(text, "Залоговая стоимость: ", "грн");
     }
 
     public ParsedProduct parseProduct() throws IOException {

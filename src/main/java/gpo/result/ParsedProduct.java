@@ -77,6 +77,6 @@ public class ParsedProduct {
     }
 
     public String toString() {
-        return title + ", (" + rate1w + ", " + rate1m +", " + deposite + "): " + description;
+        return title + ", (" + rate1w + ", " + rate1m +", " + deposite + "): " + description + " img.src: " + defaultImage;
     }
 }
